@@ -7,6 +7,7 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "r": "node --watch index.js",
     "p": "npx drizzle-kit push",
     "s": "npx drizzle-kit studio"
