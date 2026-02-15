@@ -14,7 +14,7 @@ app.use("/api/worker", workerRoutes);
 app.use("/api/admin", adminRoutes);
 
 app.get("/", async (req, res) => {
-    res.status(200).send("<h1>Hari Hari 🙏🙏 !!</h1>")
+    res.status(200).send(`<h1 style="font-family: 'Segoe UI Semibold', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 2.5rem; font-weight: 600; line-height: 1.2; margin: 0 0 1rem 0;">Hari Hari 🙏 🙏</h1>`)
 })
 
 export default app;
