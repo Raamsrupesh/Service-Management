@@ -13,4 +13,8 @@ app.use("/api/officer", officerRoutes);
 app.use("/api/worker", workerRoutes);
 app.use("/api/admin", adminRoutes);
 
+app.get("/", async (req, res) => {
+    res.status(200).send("<h1>Hari Hari 🙏🙏 !!</h1>")
+})
+
 export default app;
