@@ -1,6 +1,8 @@
 import { eq } from 'drizzle-orm';
 import db from '../config/db.js';
 import {servicesTable} from '../models/services.model.js';
+import { usersTable } from '../models/user.model.js';
+import { workersTable } from '../models/workers.model.js';
 
 export async function acceptingUserRequest(req, res) {
     const {id} = req.params;
@@ -36,4 +38,22 @@ export async function getUserRequests(req, res) {
 export async function approvingRequest(req, res) {
     const[curMode]= await db.update(servicesTable).set({status:"APPROVED"}).where(eq(servicesTable.id, req.params.id)).returning({mode:servicesTable.status});
     return res.status(200).json({msg:`Successfully, Changed the mode to '${curMode.mode}'`});
+}
+export async function queryUserServiceRequests(req, res) {
+    const {service} = req.query;
+    const servicequery = await db.select().from(servicesTable).where(eq(servicesTable.service_type, service));
+    return res.status(200).json({service, results:servicequery});
+}
+
+export async function queryWorkerServices(req, res) {
+    const {service} = req.query;
+    const servicecategory = await db.select().from(workersTable).where(eq(workersTable.service_category, service));
+    return res.status(200).json({service, results:servicecategory})
+}
+
+export async function getAllWorkers(req, res) {
+    const {page, limit} = req.query;
+    const offset = (page - 1) * limit; 
+    const allWorkers = await db.select().from(usersTable).innerJoin(workersTable, eq(usersTable.id, workersTable.user)).limit(limit).offset(offset);
+    return res.status(200).json({allWorkers});
 }

@@ -1,6 +1,6 @@
 import express from "express";
 const app = express.Router();
-import {acceptingUserRequest, queryUserRequests, getUserRequests, rejectingUserRequest, assigingUserRequest, approvingRequest} from '../controllers/officer.controller.js';
+import {acceptingUserRequest, queryUserRequests, getUserRequests, rejectingUserRequest, assigingUserRequest, approvingRequest, queryUserServiceRequests, queryWorkerServices, getAllWorkers} from '../controllers/officer.controller.js';
 import {userMiddleWare} from '../middlewares/auth.middle.js';
 import {officerMiddleWare} from '../middlewares/officer.mid.js'
 
@@ -13,7 +13,7 @@ app.patch("/requests/:id/reject", rejectingUserRequest);
 app.patch("/requests/:id/assign", assigingUserRequest);
 app.patch("/requests/:id/approve", approvingRequest);
 app.get("/requests", queryUserRequests);
-
-
-// app.get("/officer/allWorkers", getAllWorkers);
+app.get("/requests", queryUserServiceRequests);
+app.get("/worker", queryWorkerServices);
+app.get("/allWorkers", getAllWorkers);
 export default app;
