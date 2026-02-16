@@ -1,4 +1,5 @@
 import express from "express";
+import cookieParser from "cookie-parser";
 import authRoutes from './routes/auth.router.js';
 import userRoutes from "./routes/user.router.js";
 import officerRoutes from './routes/officer.routes.js';
@@ -6,6 +7,7 @@ import workerRoutes from './routes/worker.router.js';
 import adminRoutes from './routes/admin.router.js';
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);

@@ -5,7 +5,6 @@ import argon from 'argon2';
 import {usersTable} from "../models/user.model.js";
 import {otpsTable} from "../models/otp.model.js";
 import {sendRegistrationEmail,sendEmail} from "../services/email.service.js";
-import { log } from "node:console";
 import {isValidEmail} from '../utils/emailcheck.js';
 
 
@@ -20,7 +19,6 @@ export async function registerController(req,res) {
         }
         const [user] = await db.select().from(usersTable).where(eq(usersTable.email, email));
         const [actotp] = await db.select().from(otpsTable).where(eq(otpsTable.email,email))
-        log(user, actotp);
         if(!user && !actotp){
             const hashedPassword = await argon.hash(password);
             const [newUser] = await db.insert(usersTable).values({
@@ -61,6 +59,7 @@ export async function verifyEmail(req, res) {
         const [user] = await db.select().from(usersTable).where(eq(usersTable.email, email));
         const token = await jwt.sign({id:user.id, role:"USER"}, process.env.JWT_TOKEN, {expiresIn:"1d"});
         await sendRegistrationEmail(email, "Resident!!");
+        res.cookie("token", token);
         return res.status(200).json({msg:"Email Verification Successfull!!!", token});
     }
     return res.status(400).json({msg:"Invalid Credentials!!"});
@@ -98,6 +97,7 @@ export async function loginController(req,res) {
             return res.status(403).json({msg:"You are not authorized yet!!"});
         }
         const token = await jwt.sign({id:user.id, role:user.role},process.env.JWT_TOKEN, {expiresIn:"1d"});
+        res.cookie("token", token);
         return res.status(200).json({msg:"User Logged IN!!", token});
     }
 }
