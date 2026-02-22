@@ -2,6 +2,8 @@ import "dotenv/config";
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
+  port: 587,  // ✅ TLS port (Render allows)
+  secure: false,  // false for 587
   service: 'gmail',
   auth: {
     type: 'OAuth2',
