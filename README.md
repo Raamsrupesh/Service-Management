@@ -48,7 +48,7 @@ Service Management is a backend API designed to handle multiple user roles inclu
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Raamsrupesh/Service-Management
    cd Service\ Management
    ```
 
