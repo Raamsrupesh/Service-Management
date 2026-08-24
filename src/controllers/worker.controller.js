@@ -31,3 +31,4 @@ export async function getWorkerProfile(req, res) {
     const [workerDet] = await db.select().from(usersTable).leftJoin(workersTable, eq(usersTable.id, workersTable.user));
     return res.status(200).json({details:{...workerDet['usersTable'], ...workerDet['workersTable']}});
 }
+

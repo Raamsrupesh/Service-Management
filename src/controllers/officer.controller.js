@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { eq, desc, asc } from 'drizzle-orm';
 import db from '../config/db.js';
 import {servicesTable} from '../models/services.model.js';
 import { usersTable } from '../models/user.model.js';
@@ -31,7 +31,7 @@ export async function assigingUserRequest(req, res) {
 
 export async function getUserRequests(req, res) {
     const {id} = req.params;
-    const [userReqs] = await db.select().from(servicesTable).where(eq(servicesTable.id, id));
+    const [userReqs] = await db.select().from(servicesTable).where(eq(servicesTable.id, id)).orderBy(asc(servicesTable.date));
     return res.status(200).json({msg:userReqs});
 }
 
@@ -39,6 +39,7 @@ export async function approvingRequest(req, res) {
     const[curMode]= await db.update(servicesTable).set({status:"APPROVED"}).where(eq(servicesTable.id, req.params.id)).returning({mode:servicesTable.status});
     return res.status(200).json({msg:`Successfully, Changed the mode to '${curMode.mode}'`});
 }
+
 export async function queryUserServiceRequests(req, res) {
     const {service} = req.query;
     const servicequery = await db.select().from(servicesTable).where(eq(servicesTable.service_type, service));

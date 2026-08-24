@@ -7,8 +7,7 @@ import {otpsTable} from "../models/otp.model.js";
 import {sendRegistrationEmail,sendEmail} from "../services/email.service.js";
 import {isValidEmail} from '../utils/emailcheck.js';
 
-
-export async function registerController(req,res) {
+export async function registerController(req, res, next) {
     try{
         const {name, email, password, dno, address, phno} = req.body;
         if(!isValidEmail(email)){
@@ -51,7 +50,7 @@ export async function registerController(req,res) {
     }
 }
 
-export async function verifyEmail(req, res) {
+export async function verifyEmail(req, res, next) {
     const {email, otp} = req.body;
     const [newOTP] = await db.delete(otpsTable).where(eq(otpsTable.email, email)).returning({otp:otpsTable.otp});
     if(Number(newOTP.otp) === Number(otp)){
@@ -65,7 +64,7 @@ export async function verifyEmail(req, res) {
     return res.status(400).json({msg:"Invalid Credentials!!"});
 }
 
-export async function resendOTP(req, res) {
+export async function resendOTP(req, res, next) {
     const {email} = req.body;
     await db.delete(otpsTable).where(eq(otpsTable.email, email));
     const otp = Math.floor(Math.random()*1000000);
@@ -79,7 +78,7 @@ export async function resendOTP(req, res) {
     return res.status(200).json({msg: "OTP Sent Successfully!!"});
 }
 
-export async function loginController(req,res) {
+export async function loginController(req, res, next) {
     const {email, password} = req.body;
     if(!isValidEmail(email)){
         return res.status(400).json({msg:"Not valid email"});

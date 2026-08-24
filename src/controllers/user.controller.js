@@ -71,27 +71,32 @@ export async function editPassword(req, res) {
 
 export async function newServiceRequest(req, res) {
     const {id} = req.user;
+    if(!req.file){
+        return res.status(400).json({msg : "No file found!!"});
+    }
+    
     const {service_type, desc, address, phno} = req.body;
     const [service_req] = await db.insert(servicesTable).values({
         user:id,
         service_type:service_type,
         desc,
         address,
-        phno
+        phno,
+        image_url: req.file.path
     }).returning();
-    const [user] = await db.select().from(usersTable).where(eq(usersTable.id, id))
+    const [user] = await db.select().from(usersTable).where(eq(usersTable.id, id));
     const text = `Dear Resident,
     
-Thank you for submitting your service request. We have received your details and our team will review it shortly.
-    
-Service Type: ${service_type}
-Description: ${desc}
-    
-We appreciate your patience and will contact you soon with next steps or an estimated timeline.
-    
-Best regards,
-Your Govt. Service Management Team.`
-    await sendEmail(user.email, "Requested a service from Govt. Service Management!", text)
+        Thank you for submitting your service request. We have received your details and our team will review it shortly.
+            
+        Service Type: ${service_type}
+        Description: ${desc}
+            
+        We appreciate your patience and will contact you soon with next steps or an estimated timeline.
+            
+        Best regards,
+        Your Govt. Service Management Team.`
+    await sendEmail(user.email, "Requested a service from Govt. Service Management!", text);
     return res.status(201).json({msg:"Created a Service Request!!", details:service_req});
 }
 
