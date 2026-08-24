@@ -72,11 +72,15 @@ export async function editPassword(req, res) {
 export async function newServiceRequest(req, res) {
     const {id} = req.user;
     if(!req.file){
-        return res.status(400).json({msg : "No file found!!"});
+        return res.status(400).json({msg : "No file found!! Please upload colony photo."});
     }
     
     const {service_type, desc, address, phno} = req.body;
-    const [service_req] = await db.insert(servicesTable).values({
+    if(!service_type || !desc || !address || !phno){
+        return res.status(400).json({msg : "All fields are required!"});
+    }
+    
+    const service_req = await db.insert(servicesTable).values({
         user:id,
         service_type:service_type,
         desc,
@@ -84,20 +88,27 @@ export async function newServiceRequest(req, res) {
         phno,
         image_url: req.file.path
     }).returning();
-    const [user] = await db.select().from(usersTable).where(eq(usersTable.id, id));
+    
+    const user = await db.select().from(usersTable).where(eq(usersTable.id, id));
+    if(user.length === 0){
+        return res.status(404).json({msg:"User not found!"});
+    }
+    
     const text = `Dear Resident,
     
         Thank you for submitting your service request. We have received your details and our team will review it shortly.
             
         Service Type: ${service_type}
         Description: ${desc}
+        Address: ${address}
             
         We appreciate your patience and will contact you soon with next steps or an estimated timeline.
             
         Best regards,
         Your Govt. Service Management Team.`
-    await sendEmail(user.email, "Requested a service from Govt. Service Management!", text);
-    return res.status(201).json({msg:"Created a Service Request!!", details:service_req});
+    
+    await sendEmail(user[0].email, "Requested a service from Govt. Service Management!", text);
+    return res.status(201).json({msg:"Created a Service Request!!", details:service_req[0]});
 }
 
 export async function getAllServices(req, res) {

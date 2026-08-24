@@ -23,8 +23,26 @@ export async function startingAssignedTask(req, res) {
 
 export async function completingAssignedTask(req, res) {
     const{id} = req.params;
-    await db.update(servicesTable).set({status:"COMPLETED"}).where(eq(servicesTable.id, id));
-    return res.status(200).json({msg:"Updated Successfully!"});
+    
+    if(!req.file){
+        return res.status(400).json({msg : "No completion photo found!! Please upload photo showing work is completed."});
+    }
+    
+    const service = await db.select().from(servicesTable).where(eq(servicesTable.id, id));
+    if(service.length === 0){
+        return res.status(404).json({msg:"Service request not found!"});
+    }
+    
+    if(service[0].assigned_worker_id !== req.user.id){
+        return res.status(403).json({msg:"You are not assigned to this service!"});
+    }
+    
+    await db.update(servicesTable).set({
+        status:"COMPLETED",
+        completion_image_url: req.file.path
+    }).where(eq(servicesTable.id, id));
+    
+    return res.status(200).json({msg:"Task completed successfully!", completion_image_url: req.file.path});
 }
 
 export async function getWorkerProfile(req, res) {
